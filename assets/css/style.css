@@ -1,0 +1,345 @@
+/**
+ * assets/css/style.css
+ * Baba Academy Admission Form System - Styling based on Style Guide
+ * Phase 3 - CSS Logic
+ */
+
+/* -------------------------------------------
+ * 1. Color Palette (Variables) & Typography
+ * ------------------------------------------- */
+:root {
+    /* Color Palette */
+    --primary-purple: #8A2BE2; /* پرائمری رنگ */
+    --accent-purple: #F3E5F5;  /* ثانوی رنگ (ہلکا) */
+    --text-color: #6A1B9A;     /* ٹیکسٹ کا رنگ */
+    --main-bg: #ffffff;        /* بنیادی بیک گراؤنڈ */
+    --container-bg: #f9f9f9;   /* کنٹینر کا بیک گراؤنڈ */
+    --button-border: #D1C4E9;  /* بٹن کا بارڈر */
+    --error-color: #e53935;    /* ایرر رنگ */
+    --success-color: #4CAF50;  /* کامیابی کا رنگ */
+    --border-color: #eee;      /* عام بارڈر */
+    
+    /* Spacing */
+    --space-sm: 8px;
+    --space-md: 15px;
+    --space-lg: 20px;
+    --space-xl: 30px;
+    --space-xxl: 40px;
+
+    /* Typography */
+    --font-sans: 'Inter', sans-serif;
+    --font-urdu: 'Noto Nastaliq Urdu', serif; 
+}
+
+/* -------------------------------------------
+ * Global Reset and Base Styles
+ * ------------------------------------------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--main-bg);
+    color: #333;
+    line-height: 1.6;
+    padding-bottom: 50px;
+}
+
+/* Bi-lingual support (RTL for Urdu) */
+[data-lang="ur"] body, 
+[data-lang="ur"] .admission-form {
+    font-family: var(--font-urdu);
+    direction: rtl;
+    text-align: right;
+}
+
+/* -------------------------------------------
+ * 2. Layout (Header, Container, Footer)
+ * ------------------------------------------- */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+/* Header/Hero Styles */
+.header {
+    background-color: var(--container-bg);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--button-border);
+}
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo {
+    color: var(--primary-purple);
+    font-size: 1.8em;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.hero {
+    background-color: var(--accent-purple);
+    padding: var(--space-xxl) 0;
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+.hero h1 {
+    color: var(--primary-purple);
+    font-size: 2.5em; /* <h1> Size */
+    margin-bottom: var(--space-sm);
+}
+.hero p {
+    color: var(--text-color);
+    font-size: 1.1em;
+}
+
+/* Main Container (Card) */
+.card {
+    max-width: 450px; /* Max Width: 450px */
+    margin: var(--space-lg) auto;
+    background: var(--container-bg);
+    padding: var(--space-xl); /* Padding: 30px */
+    border-radius: 15px; /* Border Radius: 15px */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Shadow */
+    border-top: 5px solid var(--primary-purple); /* Top Border */
+}
+
+.card-title {
+    color: var(--primary-purple);
+    font-size: 1.5em;
+    margin-bottom: var(--space-lg);
+    border-bottom: 2px solid var(--button-border);
+    padding-bottom: var(--space-sm);
+}
+
+/* -------------------------------------------
+ * 3. Form Elements (Inputs & Buttons)
+ * ------------------------------------------- */
+.form-row {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.form-group {
+    flex: 1;
+    margin-bottom: var(--space-md);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+.form-label.required::after {
+    content: ' *';
+    color: var(--error-color);
+}
+
+.form-control, select.form-control {
+    width: 100%;
+    padding: var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* Border Radius: 8px */
+    font-size: 1em;
+    transition: border-color 0.3s;
+    -webkit-appearance: none; /* For select/date consistency */
+    appearance: none;
+}
+
+.form-control:focus {
+    border-color: var(--primary-purple);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+}
+
+/* Display/Readonly Fields */
+#total_fee, #remaining_balance {
+    font-size: 1.5em; /* Input/Display Field: 2.5em/40px. Reduced for better form flow */
+    font-weight: bold;
+    color: var(--primary-purple);
+    background-color: var(--accent-purple) !important; /* Lighter background for readonly */
+    border: 1px solid var(--primary-purple);
+}
+
+/* Error Styling */
+.form-control.is-invalid, .upload-area.is-invalid-upload {
+    border-color: var(--error-color) !important;
+}
+.error-message {
+    color: var(--error-color);
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+/* Button Styling */
+.btn-primary {
+    display: inline-block;
+    padding: 20px 40px; /* Padding: 20px */
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    background-color: var(--primary-purple);
+    color: var(--main-bg);
+    font-size: 1.5em; /* Button Text Size: 1.5em/24px */
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover:not(:disabled) { /* Hover Effect */
+    background-color: #6A1B9A; /* Darker Purple on hover */
+    color: var(--main-bg);
+    border-color: var(--primary-purple);
+}
+.btn-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    border-color: #aaa;
+}
+
+
+/* -------------------------------------------
+ * 4. Payment & Upload Specifics
+ * ------------------------------------------- */
+.payment-section {
+    background-color: var(--accent-purple);
+    padding: var(--space-lg);
+    margin: var(--space-xl) 0;
+    border: 1px solid var(--button-border);
+}
+.course-fee-display {
+    padding: var(--space-sm);
+    background: #e9e2f5;
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* Payment Summary */
+.payment-summary {
+    background-color: var(--main-bg);
+    padding: var(--space-md);
+    border-radius: 8px;
+    margin-top: var(--space-lg);
+    border: 1px solid var(--border-color);
+}
+.payment-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 0.95em;
+}
+.payment-item.total {
+    font-weight: bold;
+    border-top: 1px dashed var(--border-color);
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+}
+
+/* Progress Bar */
+.payment-progress-bar {
+    width: 100%; 
+    height: 8px; 
+    background: var(--button-border); 
+    border-radius: 4px;
+}
+.payment-progress {
+    height: 100%; 
+    background: var(--primary-purple); 
+    border-radius: 4px; 
+    transition: width 0.3s ease;
+}
+#paymentPercentage {
+    margin-top: 4px; 
+    font-size: 12px; 
+    color: var(--text-color);
+    text-align: right;
+}
+
+/* File Upload Area */
+.upload-area {
+    border: 2px dashed var(--button-border);
+    border-radius: 8px;
+    padding: var(--space-xl);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s, background-color 0.3s;
+    background-color: var(--main-bg);
+}
+.upload-area.highlight {
+    border-color: var(--primary-purple);
+    background-color: #f7f3ff;
+}
+.upload-area.is-invalid-upload {
+    border-color: var(--error-color) !important;
+}
+.upload-icon {
+    font-size: 2.5em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+.file-preview {
+    margin-top: var(--space-md);
+    padding: var(--space-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--main-bg);
+    min-height: 40px;
+}
+
+/* Alert Messages (PHP feedback) */
+.alert {
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1.1em;
+}
+.alert ul {
+    margin-top: var(--space-sm);
+    margin-left: var(--space-md);
+}
+.alert-success {
+    background-color: #e8f5e9; /* Light Green */
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+.alert-error {
+    background-color: #ffebee; /* Light Red */
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+}
+
+/* -------------------------------------------
+ * 5. Responsiveness (Mobile-Friendly)
+ * ------------------------------------------- */
+@media (max-width: 600px) {
+    .card {
+        padding: var(--space-lg);
+        margin: var(--space-md);
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .hero h1 {
+        font-size: 2em;
+    }
+    .btn-primary {
+        width: 100%;
+        padding: 15px 20px;
+        font-size: 1.2em;
+    }
+    .form-control, select.form-control, #total_fee, #remaining_balance {
+        padding: var(--space-sm);
+    }
+}
