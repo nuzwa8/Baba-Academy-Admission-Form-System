@@ -285,7 +285,7 @@ if (!preg_match('/^(\+92|0)\s*\d{3}\s*\d{7}$/', $form_data['phone_number'])) {
 
                 <div class="form-group">
                     <label class="form-label required" data-translate="form.upload_screenshot">Upload Screenshot</label>
-                    <div class="upload-area" id="upload_area"> <input type="file" id="screenshot_path" name="screenshot" accept=".jpg,.jpeg,.png,.pdf" style="display: none;" required>
+                    <div class="upload-area" id="upload_area"> <input type="file" id="screenshot_path" name="screenshot" accept=".jpg,.jpeg,.png,.pdf" style=";" required>
                         <div class="upload-icon">📄</div>
                         <p>Drag & drop your  screenshot here, or click to browse</p>
                         <small>Maximum file size: 5MB. Accepted formats: JPG, PNG, PDF</small>
