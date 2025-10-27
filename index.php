@@ -272,10 +272,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label required" data-translate="form.upload_screenshot">Upload Payment Screenshot</label>
-                    <div class="upload-area" id="upload_area"> <input type="file" id="screenshot_path" name="payment_screenshot" accept=".jpg,.jpeg,.png,.pdf" style="display: none;" required>
+                    <label class="form-label required" data-translate="form.upload_screenshot">Upload Screenshot</label>
+                    <div class="upload-area" id="upload_area"> <input type="file" id="screenshot_path" name="screenshot" accept=".jpg,.jpeg,.png,.pdf" style="display: none;" required>
                         <div class="upload-icon">📄</div>
-                        <p>Drag & drop your payment screenshot here, or click to browse</p>
+                        <p>Drag & drop your  screenshot here, or click to browse</p>
                         <small>Maximum file size: 5MB. Accepted formats: JPG, PNG, PDF</small>
                     </div>
                     <div class="file-preview" id="file_preview"></div> <div class="error-message"></div>
