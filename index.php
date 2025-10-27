@@ -36,7 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($form_data['next_payment_date']) && $form_data['remaining_balance'] > 0) { $errors[] = 'Next Payment Date is required.'; }
     
     // Format Checks
-    if (!preg_match('/^\+92\s\d{3}\s\d{7}$/', $form_data['phone_number'])) { $errors[] = 'Phone Number is not in the correct format (+92 3XX XXXXXXX).'; }
+    // New regex: Allows +92 3XX XXXXXXX OR +923XXXXXXXXX OR 03XXXXXXXXX
+if (!preg_match('/^(\+92|0)\s*\d{3}\s*\d{7}$/', $form_data['phone_number'])) { 
+    $errors[] = 'Phone Number is not in the correct format (+92 3XX XXXXXXX).'; 
+}
     if (!filter_var($form_data['email'], FILTER_VALIDATE_EMAIL)) { $errors[] = 'A valid Email Address is required.'; }
 
     $selected_course = CourseManager::getCourseById($form_data['course_id']);
