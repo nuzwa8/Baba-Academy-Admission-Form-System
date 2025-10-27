@@ -71,17 +71,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $unique_filename = uniqid('screenshot_') . '.' . $file_extension;
             $destination = UPLOAD_DIR . $unique_filename;
             
+            // Move file if no errors occurred yet
+        if (empty($errors)) {
+            $unique_filename = uniqid('screenshot_') . '.' . $file_extension;
+            $destination = UPLOAD_DIR . $unique_filename;
+            
+            // 1. Ensure UPLOAD_DIR exists. Use 0755 for creation (Hostinger approved).
             if (!is_dir(UPLOAD_DIR)) {
-                // Since we set 774 permissions manually, we only need to ensure it exists
-                // Note: The mkdir(0777) line is left here for general use, but 774 works on Hostinger
-                mkdir(UPLOAD_DIR, 0777, true); 
+                // We use @ to suppress warnings in case the directory creation fails due to security
+                @mkdir(UPLOAD_DIR, 0755, true); 
             }
 
+            // 2. Attempt to move the uploaded file.
             if (!move_uploaded_file($file['tmp_name'], $destination)) {
-                $errors[] = 'File upload failed. Check folder permissions.';
+                $errors[] = 'File upload failed. Please verify that the uploads folder has 755 permissions.';
             } else {
+                // 3. Optional: Set file permissions to 0644 for security (Hostinger recommended)
+                @chmod($destination, 0644); 
                 $file_path = 'uploads/' . $unique_filename; // Relative path for storage
             }
+        }
         }
     } else {
           $errors[] = 'Payment Screenshot is required.';
