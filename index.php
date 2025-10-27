@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($form_data['student_name'])) { $errors[] = 'Student Name is required.'; }
     if (empty($form_data['parent_name'])) { $errors[] = 'Parent/Guardian Name is required.'; }
     if (empty($form_data['course_id'])) { $errors[] = 'Course Selection is required.'; }
-    if (empty($form_data['next_payment_date'])) { $errors[] = 'Next Payment Date is required.'; }
+    if (empty($form_data['next_payment_date']) && $form_data['remaining_balance'] > 0) { $errors[] = 'Next Payment Date is required.'; }
     
     // Format Checks
     if (!preg_match('/^\+92\s\d{3}\s\d{7}$/', $form_data['phone_number'])) { $errors[] = 'Phone Number is not in the correct format (+92 3XX XXXXXXX).'; }
@@ -43,13 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Fee Consistency Checks (Ensuring student hasn't manipulated the fixed fee)
     if ($selected_course && $form_data['total_fee'] != $selected_course['fee_amount']) {
-         $errors[] = 'Total Fee mismatch. The fixed fee for the selected course is ' . formatCurrency($selected_course['fee_amount']) . ' PKR.';
+          $errors[] = 'Total Fee mismatch. The fixed fee for the selected course is ' . formatCurrency($selected_course['fee_amount']) . ' PKR.';
     }
     if ($form_data['amount_paid'] < 0 || $form_data['amount_paid'] > $form_data['total_fee']) {
-         $errors[] = 'Amount Paid must be a non-negative value and less than or equal to the Total Fee.';
+          $errors[] = 'Amount Paid must be a non-negative value and less than or equal to the Total Fee.';
     }
     if (abs(($form_data['total_fee'] - $form_data['amount_paid']) - $form_data['remaining_balance']) > 1) { // Floating point comparison tolerance
-         $errors[] = 'The Remaining Balance calculation is incorrect.';
+          $errors[] = 'The Remaining Balance calculation is incorrect.';
     }
     
     // 2. File Upload Handling
@@ -72,7 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $destination = UPLOAD_DIR . $unique_filename;
             
             if (!is_dir(UPLOAD_DIR)) {
-                mkdir(UPLOAD_DIR, 0777, true);
+                // Since we set 774 permissions manually, we only need to ensure it exists
+                // Note: The mkdir(0777) line is left here for general use, but 774 works on Hostinger
+                mkdir(UPLOAD_DIR, 0777, true); 
             }
 
             if (!move_uploaded_file($file['tmp_name'], $destination)) {
@@ -82,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } else {
-         $errors[] = 'Payment Screenshot is required.';
+          $errors[] = 'Payment Screenshot is required.';
     }
 
     // 3. Save Data to Database/File
@@ -263,28 +265,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="payment-summary">
-                        <div class="payment-item"><span>Total Fee:</span> <span id="summaryTotalFee">PKR 0</span></div>
-                        <div class="payment-item"><span>Amount Paid:</span> <span id="summaryAmountPaid">PKR 0</span></div>
-                        <div class="payment-item total"><span>Remaining Balance:</span> <span id="summaryRemainingBalance">PKR 0</span></div>
-                        </div>
+                        <div class="payment-item"><span>Total Fee:</span> <span id="summary_total_fee">PKR 0</span></div>
+                        <div class="payment-item"><span>Amount Paid:</span> <span id="summary_amount_paid">PKR 0</span></div>
+                        <div class="payment-item total"><span>Remaining Balance:</span> <span id="summary_remaining_balance">PKR 0</span></div>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label required" data-translate="form.upload_screenshot">Upload Payment Screenshot</label>
-                    <div class="upload-area" id="uploadArea">
-                        <input type="file" id="payment_screenshot" name="payment_screenshot" 
-                               accept=".jpg,.jpeg,.png,.pdf" style="display: none;" required>
+                    <div class="upload-area" id="upload_area"> <input type="file" id="screenshot_path" name="payment_screenshot" accept=".jpg,.jpeg,.png,.pdf" style="display: none;" required>
                         <div class="upload-icon">📄</div>
                         <p>Drag & drop your payment screenshot here, or click to browse</p>
                         <small>Maximum file size: 5MB. Accepted formats: JPG, PNG, PDF</small>
                     </div>
-                    <div class="file-preview" id="filePreview"></div>
-                    <div class="error-message"></div>
+                    <div class="file-preview" id="file_preview"></div> <div class="error-message"></div>
                 </div>
 
                 <div class="form-group submit-group">
-                    <button type="submit" class="btn btn-primary" id="submitButton">
-                        <span data-translate="form.submit">Submit Application</span>
+                    <button type="submit" class="btn btn-primary" id="submit_application"> <span data-translate="form.submit">Submit Application</span>
                     </button>
                 </div>
             </form>
@@ -300,8 +298,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="assets/js/main.js"></script> 
     
     <script>
-        // Placeholder for initial course data access if needed by JS (e.g., for validation)
-        const COURSE_DATA = <?= json_encode($courses) ?>;
+        // Data embedded for main.js to use
+        const feesDataElement = document.createElement('script');
+        feesDataElement.id = 'fees_data';
+        feesDataElement.type = 'application/json';
+        
+        // Transform the course data array into a fee mapping object {id: fee_amount}
+        const feesMap = {};
+        <?php foreach ($courses as $course): ?>
+            feesMap['<?= $course['id'] ?>'] = <?= $course['fee_amount'] ?>;
+        <?php endforeach; ?>
+
+        feesDataElement.textContent = JSON.stringify(feesMap);
+        document.body.appendChild(feesDataElement);
+    </script>
+
+    <script>
+        // Note: The logic below is largely redundant since main.js handles the calculation now, 
+        // but kept for reference consistency.
+        const courseSelectLegacy = document.getElementById('course_id');
+        const courseFeeDisplayLegacy = document.getElementById('courseFeeDisplay');
+        const feeAmountLegacy = document.getElementById('feeAmount');
+
+        function updateLegacyFeeDisplay() {
+            const selectedOption = courseSelectLegacy.options[courseSelectLegacy.selectedIndex];
+            const fee = selectedOption.getAttribute('data-fee');
+            if (fee) {
+                feeAmountLegacy.textContent = 'PKR ' + parseFloat(fee).toLocaleString('en-US');
+                courseFeeDisplayLegacy.style.display = 'block';
+            } else {
+                courseFeeDisplayLegacy.style.display = 'none';
+            }
+        }
+        courseSelectLegacy.addEventListener('change', updateLegacyFeeDisplay);
+        updateLegacyFeeDisplay(); // Initial display update
     </script>
 </body>
 </html>
